@@ -32,7 +32,9 @@
             is_natural: 'The %s field must contain only positive numbers.',
             is_natural_no_zero: 'The %s field must contain a number greater than zero.',
             valid_ip: 'The %s field must contain a valid IP.',
-            valid_base64: 'The %s field must contain a base64 string.'
+            valid_base64: 'The %s field must contain a base64 string.',
+            valid_postCode: 'The %s field must be postcode',
+            valid_mobile: 'The %s field must be postcode'
         },
         callback: function(errors) {
 
@@ -54,7 +56,9 @@
         naturalRegex = /^[0-9]+$/i,
         naturalNoZeroRegex = /^[1-9][0-9]*$/i,
         ipRegex = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/i,
-        base64Regex = /[^a-zA-Z0-9\/\+=]/i;
+        base64Regex = /[^a-zA-Z0-9\/\+=]/i,
+        postCodeRegex = /^[0-9]{6}$/,
+        mobileRegex = /^1[3-9]{1}[0-9]{1}[0-9]{8}$/;
 
     /*
      * The exposed public object to validate a form:
@@ -384,7 +388,15 @@
 
         valid_base64: function(field) {
             return (base64Regex.test(field.value));
+        },
+        valid_postCode:function(field){
+            return (postCodeRegex.test(field.value));
+        },
+        valid_mobile:function(field){
+            return (mobileRegex.test(field.value));
         }
+
+
     };
 
     window.FormValidator = FormValidator;
