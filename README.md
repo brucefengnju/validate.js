@@ -17,10 +17,12 @@ validate.js is a lightweight JavaScript form validation library inspired by Code
     var validator = new FormValidator('example_form', [{
         name: 'req',
         display: 'required',    
-        rules: 'required'
+        rules: 'required',
+        event:'focus'
     }, {
         name: 'alphanumeric',
-        rules: 'alpha_numeric'
+        rules: 'alpha_numeric',
+        event:'focus'
     }, {
         name: 'password',
         rules: 'required'

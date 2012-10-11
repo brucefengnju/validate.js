@@ -34,7 +34,8 @@
             valid_ip: 'The %s field must contain a valid IP.',
             valid_base64: 'The %s field must contain a base64 string.',
             valid_postCode: 'The %s field must be postcode',
-            valid_mobile: 'The %s field must be postcode'
+            valid_mobile: 'The %s field must be postcode',
+            special_string:'The %s field must contain special string'
         },
         callback: function(errors) {
 
@@ -58,7 +59,8 @@
         ipRegex = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$/i,
         base64Regex = /[^a-zA-Z0-9\/\+=]/i,
         postCodeRegex = /^[0-9]{6}$/,
-        mobileRegex = /^1[3-9]{1}[0-9]{1}[0-9]{8}$/;
+        mobileRegex = /^1[3-9]{1}[0-9]{1}[0-9]{8}$/,
+        specialStringRegex = new RegExp("[`~!@#$^&*()%+=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]")
 
     /*
      * The exposed public object to validate a form:
@@ -81,6 +83,12 @@
         this.form = document.forms[formName] || {};
         this.messages = {};
         this.handlers = {};
+        this.fieldEvent = (function(that){
+        return function(event){
+            var field = that.fields[event.target.name];
+            that._validateField(field);
+        }
+    })(this);
 
         for (var i = 0, fieldLength = fields.length; i < fieldLength; i++) {
             var field = fields[i];
@@ -88,6 +96,16 @@
             // If passed in incorrectly, we need to skip the field.
             if (!field.name || !field.rules) {
                 continue;
+            }
+            if(field.event){
+                var element = this.form[field.name];
+                if(element.attachEvent){
+                    element.attachEvent('on'+ field.event,this.fieldEvent);
+                }else{
+                    try{
+                        element.addEventListener(field.event,this.fieldEvent);
+                    }catch(e){}
+                }
             }
 
             /*
@@ -117,7 +135,7 @@
             }
         })(this);
     };
-
+   
     /*
      * @public
      * Sets a custom message for one of the rules
@@ -129,7 +147,29 @@
         // return this for chaining
         return this;
     };
+    /*
+     * @public
+     * add event to field
+     */
+    FormValidator.prototype.addEvent= function(field,evt){
+        //待续
+        for(var i=0; i<this.fields.length;i++){
+            if(this.fields[i].name===field.name) break;
+        }
+        if(i>= this.fields.length) return;
+        field = this.fields[i];
+        if(field.event){
+            var element = this.form[field.name];
+            if(field.attachEvent){
+                element.attachEvent('on'+ event,this.fieldEvent);
+            }else{
+                try{
+                    element.addEventListener(event,this.fieldEvent);
+                }catch(e){}
+            }
+        }
 
+     };
     /*
      * @public
      * Registers a callback for a custom rule (i.e. callback_username_check)
@@ -394,8 +434,13 @@
         },
         valid_mobile:function(field){
             return (mobileRegex.test(field.value));
+        },
+        vlaid_hasSpecial:function(field){
+            if(specialStringRegex.test(field).value){
+                return true;
+            }
+            return false;
         }
-
 
     };
 
