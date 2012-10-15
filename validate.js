@@ -85,8 +85,7 @@
         this.handlers = {};
         this.fieldEvent = (function(that){
         return function(event){
-            var field = that.fields[event.target.name];
-            that._validateField(field);
+            that._validateElement(event);
         }
     })(this);
 
@@ -149,29 +148,6 @@
     };
     /*
      * @public
-     * add event to field
-     */
-    FormValidator.prototype.addEvent= function(field,evt){
-        //待续
-        for(var i=0; i<this.fields.length;i++){
-            if(this.fields[i].name===field.name) break;
-        }
-        if(i>= this.fields.length) return;
-        field = this.fields[i];
-        if(field.event){
-            var element = this.form[field.name];
-            if(field.attachEvent){
-                element.attachEvent('on'+ event,this.fieldEvent);
-            }else{
-                try{
-                    element.addEventListener(event,this.fieldEvent);
-                }catch(e){}
-            }
-        }
-
-     };
-    /*
-     * @public
      * Registers a callback for a custom rule (i.e. callback_username_check)
      */
 
@@ -227,7 +203,36 @@
 
         return true;
     };
+    
+    /*
+     * @public
+     * valid element 
+     */
 
+    FormValidator.prototype._validateElement = function(event){
+        var element = event.target;
+        if(!element || element === undefined){
+            return;
+        }
+        var field = this.fields[element.name];
+        field.id = element.id;
+        field.type = element.type;
+        field.value = element.value;
+        field.checked = element.checked;
+        this._validateField(field);
+        if(typeof this.callback === 'function'){
+            this.callback(this.errors,event);
+        }
+        if(this.errors.length > 0){
+            if(event && event.preventDefault){
+                event.preventDefault();
+            }else{
+                return false;
+            }
+        }
+
+        return true;
+    }
     /*
      * @private
      * Looks at the fields value and evaluates it against the given rules
