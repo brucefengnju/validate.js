@@ -44,7 +44,7 @@ validate.js is a lightweight JavaScript form validation library inspired by Code
         }
     });
 	
-	`validator.setValidateEvent('click','req');
+	validator.setValidateEvent('click','req');
 	
 ## Documentation
 
