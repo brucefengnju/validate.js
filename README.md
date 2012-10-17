@@ -12,6 +12,7 @@ validate.js is a lightweight JavaScript form validation library inspired by Code
 - Works in all major browsers, (even IE6!)
 - Modeled off the CodeIgniter form validation API
 - Set the validate event
+
 ## How to use
 
     var validator = new FormValidator('example_form', [{
@@ -42,7 +43,9 @@ validate.js is a lightweight JavaScript form validation library inspired by Code
             // Show the errors
         }
     });
-	validator.setValidateEvent('click','req');
+	
+	`validator.setValidateEvent('click','req');
+	
 ## Documentation
 
 You can view everything at https://github.com/brucefengnju/validate.js
