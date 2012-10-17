@@ -84,10 +84,10 @@
         this.messages = {};
         this.handlers = {};
         this.fieldEvent = (function(that){
-        return function(event){
-            that._validateElement(event);
-        }
-    })(this);
+            return function(event){
+                that._validateElement(event);
+            }
+        })(this);
 
         for (var i = 0, fieldLength = fields.length; i < fieldLength; i++) {
             var field = fields[i];
@@ -146,6 +146,29 @@
         // return this for chaining
         return this;
     };
+    
+    /*
+     * @public
+     * Sets valid event to the field
+     */
+
+    FormValidator.prototype.setValidEvent = function(event,name){
+        var field = this.fields[name];
+        if(field && field !== undefined){
+            field.event = event;
+            var element = this.form[field.name];
+            var element = this.form[field.name];
+            if(element.attachEvent){
+                element.attachEvent('on'+ field.event,this.fieldEvent);
+            }else{
+                try{
+                    element.addEventListener(field.event,this.fieldEvent);
+                }catch(e){}
+            }
+        }
+        
+     };
+
     /*
      * @public
      * Registers a callback for a custom rule (i.e. callback_username_check)
@@ -205,34 +228,36 @@
     };
     
     /*
-     * @public
+     * @private
      * valid element 
      */
 
     FormValidator.prototype._validateElement = function(event){
         var element = event.target;
-        if(!element || element === undefined){
-            return;
-        }
-        var field = this.fields[element.name];
-        field.id = element.id;
-        field.type = element.type;
-        field.value = element.value;
-        field.checked = element.checked;
-        this._validateField(field);
-        if(typeof this.callback === 'function'){
-            this.callback(this.errors,event);
-        }
-        if(this.errors.length > 0){
-            if(event && event.preventDefault){
-                event.preventDefault();
-            }else{
-                return false;
+        if(element && element !== undefined){
+            var field = this.fields[element.name];
+            field.id = element.id;
+            field.type = element.type;
+            field.value = element.value;
+            field.checked = element.checked;
+            this._validateField(field);
+            if(typeof this.callback === 'function'){
+                this.callback(this.errors,event);
             }
+            if(this.errors.length > 0){
+                if(event && event.preventDefault){
+                    event.preventDefault();
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }else{
+            return false;
         }
 
-        return true;
     }
+
     /*
      * @private
      * Looks at the fields value and evaluates it against the given rules
@@ -314,6 +339,7 @@
             }
         }
     };
+
 
     /*
      * @private
